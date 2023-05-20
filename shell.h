@@ -40,6 +40,8 @@ int read_shell_input(shell_data *data);
 void init_shell_data(shell_data *data);
 ssize_t _getline(shell_data *data);
 void run_shell_command(shell_data *data);
+void run_file_command(const char *program_name,
+		const char *file_name, shell_data *data);
 
 #endif /* SHELL_H */
 
