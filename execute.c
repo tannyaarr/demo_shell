@@ -18,17 +18,17 @@ void execute_command(shell_data *data)
 
 	if (pid == 0)
 	{
-	       path = get_path(data, data->args[0]);
+		path = get_path(data, data->args[0]);
 
 		if (path == NULL)
-			{
-				fprintf(stderr, "%s: command not found\n", data->args[0]);
-		exit(EXIT_FAILURE);
-	}
+		{
+			fprintf(stderr, "%s: command not found\n", data->args[0]);
+			exit(EXIT_FAILURE);
+		}
 
-	execve(path, data->args, environ);
-	perror("execve");
-	exit(EXIT_FAILURE);
+		execve(path, data->args, environ);
+		perror("execve");
+		exit(EXIT_FAILURE);
 	}
 
 	else if (pid < 0)
