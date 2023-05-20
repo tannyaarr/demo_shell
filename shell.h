@@ -31,7 +31,7 @@ typedef struct shell_data
 	int num_args;
 } shell_data;
 
-char *get_path(struct shell_data *data, char *command);
+char *get_path(struct shell_data *data, const char *command);
 void tokenize(struct shell_data *data);
 void print_env(void);
 void free_shell_data(shell_data *data);
@@ -40,7 +40,6 @@ int read_shell_input(shell_data *data);
 void init_shell_data(shell_data *data);
 ssize_t _getline(shell_data *data);
 void run_shell_command(shell_data *data);
-
 
 #endif /* SHELL_H */
 
