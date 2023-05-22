@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <stdarg.h>
-
+#include <limits.h>
 
 
 #define MAX_ARGS 10
@@ -58,5 +58,6 @@ void handle_unsetenv(shell_data *data);
 void execute_command_child(shell_data *data, char *path);
 void exit_with_error(const char *format, ...);
 int is_builtin_command(const char *command);
+void cd_command(shell_data *data);
 
 #endif /* SHELL_H */
