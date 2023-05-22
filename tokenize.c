@@ -1,6 +1,4 @@
 #include "shell.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 /**
 * tokenize - tokenize a string into an array of strings

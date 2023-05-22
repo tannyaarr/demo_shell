@@ -16,33 +16,7 @@ void init_shell_data(shell_data *data)
 	data->num_args = 0;
 }
 
-/**
- * read_shell_input - reads shell input
- * @data: Struct to store data
- * Return: void
- */
 
-
-int read_shell_input(shell_data *data)
-{
-	ssize_t chars_read;
-
-	chars_read = _getline(data);
-
-	if (chars_read == -1)
-	{
-		data->line = NULL;
-		return (-1);
-	}
-	else if (chars_read == 0)
-	{
-		data->line = NULL;
-		return (-1);
-	}
-
-	tokenize(data);
-	return (0);
-}
 
 /**
  * free_shell_data - Free memory of shell data

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #define MAX_ARGS 10
 #define MAX_PATHS 10
@@ -42,6 +43,8 @@ ssize_t _getline(shell_data *data);
 void run_shell_command(shell_data *data);
 void run_file_command(const char *program_name,
 		const char *file_name, shell_data *data);
+char *get_command_path(shell_data *data);
+void wait_for_child(pid_t pid, int *status);
 
 #endif /* SHELL_H */
 
