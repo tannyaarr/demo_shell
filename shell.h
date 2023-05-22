@@ -8,6 +8,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <stdarg.h>
+
+
 
 #define MAX_ARGS 10
 #define MAX_PATHS 10
@@ -48,5 +51,12 @@ void wait_for_child(pid_t pid, int *status);
 char *_strpbrk(const char *str, const char *accept);
 int append_to_line(shell_data *data, char *input,
 		ssize_t size, ssize_t *total_chars_read);
+void set_env_variable(const char *variable, const char *value);
+void unset_env_variable(const char *variable);
+void handle_setenv(shell_data *data);
+void handle_unsetenv(shell_data *data);
+void execute_command_child(shell_data *data, char *path);
+void exit_with_error(const char *format, ...);
+int is_builtin_command(const char *command);
 
 #endif /* SHELL_H */
