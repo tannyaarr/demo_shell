@@ -47,4 +47,3 @@ char *get_command_path(shell_data *data);
 void wait_for_child(pid_t pid, int *status);
 
 #endif /* SHELL_H */
-

@@ -98,7 +98,6 @@ void run_file_command(const char *program_name,
 {
 	FILE *file;
 	ssize_t chars_read;
-	size_t buf_size = 0;
 
 	if (file_name == NULL)
 	{
@@ -113,11 +112,12 @@ void run_file_command(const char *program_name,
 		exit(EXIT_FAILURE);
 	}
 
-	while ((chars_read = getline(&data->line, &buf_size, file)) != -1)
+	while ((_getline(data)) != -1)
 	{
 		printf("(%s) ", program_name);
 		fflush(stdout);
 
+		chars_read = strlen(data->line);
 		if (chars_read > 0 && data->line[chars_read - 1] == '\n')
 			data->line[chars_read - 1] = '\0';
 
@@ -139,17 +139,31 @@ void run_file_command(const char *program_name,
 int read_shell_input(shell_data *data)
 {
 	ssize_t chars_read;
-	size_t buf_size = 0;
-	char *line = NULL;
 
-	chars_read = getline(&line, &buf_size, stdin);
-	if (chars_read == -1 || (chars_read == 0 && line == NULL))
+	if (data->line != NULL)
+	{
+		free(data->line);
+		data->line = NULL;
+	}
+
+	chars_read = _getline(data);
+	if (chars_read == -1)
+	{
+		free_shell_data(data);
 		return (-1);
-	if (chars_read > 0 && line[chars_read - 1] == '\n')
-		line[chars_read - 1] = '\0';
+	}
 
-	data->line = line;
-	tokenize(data);
-	return (0);
+	if (chars_read == 0)
+		return (-1);
+
+	if (data->line != NULL && data->line[0] != '\0')
+	{
+		if (data->line[chars_read - 1] == '\n')
+			data->line[chars_read - 1] = '\0';
+		tokenize(data);
+		return (0);
+	}
+
+	return (-1);
 }
 
