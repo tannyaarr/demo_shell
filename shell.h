@@ -45,5 +45,8 @@ void run_file_command(const char *program_name,
 		const char *file_name, shell_data *data);
 char *get_command_path(shell_data *data);
 void wait_for_child(pid_t pid, int *status);
+char *_strpbrk(const char *str, const char *accept);
+int append_to_line(shell_data *data, char *input,
+		ssize_t size, ssize_t *total_chars_read);
 
 #endif /* SHELL_H */
