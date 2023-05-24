@@ -81,5 +81,6 @@ void unset_env_variable(const char *variable)
 
 int is_builtin_command(const char *command)
 {
-	return ((strcmp(command, "setenv") == 0 || strcmp(command, "unsetenv") == 0));
+	return ((_strcmp(command, "setenv") == 0 ||
+				_strcmp(command, "unsetenv") == 0));
 }

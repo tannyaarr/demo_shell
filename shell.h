@@ -59,5 +59,10 @@ void execute_command_child(shell_data *data, char *path);
 void exit_with_error(const char *format, ...);
 int is_builtin_command(const char *command);
 void cd_command(shell_data *data);
+char *_strncpy(char *dest, const char *src, size_t n);
+size_t _strlen(const char *s);
+char *_strchr(const char *s, int c);
+int _strcmp(const char *s1, const char *s2);
+
 
 #endif /* SHELL_H */

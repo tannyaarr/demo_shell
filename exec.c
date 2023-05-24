@@ -12,12 +12,12 @@ void execute_command(shell_data *data)
 	int status;
 	char *path;
 
-	if (strcmp(data->args[0], "setenv") == 0)
+	if (_strcmp(data->args[0], "setenv") == 0)
 	{
 		handle_setenv(data);
 			return;
 	}
-	else if (strcmp(data->args[0], "unsetenv") == 0)
+	else if (_strcmp(data->args[0], "unsetenv") == 0)
 	{
 		handle_unsetenv(data);
 			return;

@@ -10,9 +10,9 @@ void cd_command(shell_data *data)
 	char *directory;
 	char current_directory[PATH_MAX];
 
-	if (data->num_args == 1 || strcmp(data->args[1], "~") == 0)
+	if (data->num_args == 1 || _strcmp(data->args[1], "~") == 0)
 		directory = getenv("HOME");
-	else if (strcmp(data->args[1], "-") == 0)
+	else if (_strcmp(data->args[1], "-") == 0)
 		directory = getenv("OLDPWD");
 	else
 		directory = data->args[1];
