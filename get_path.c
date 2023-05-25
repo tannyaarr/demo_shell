@@ -8,26 +8,21 @@
 * @command: command line argument
 * Return: path of command
 */
+
 char *get_path(shell_data *data, const char *command)
 {
-        char *path = data->path;
-        char *path_env = strdup(path);
-        char *token = strtok(path_env, ":");
-        char *full_path = malloc(PATH_MAX_LENGTH);
+	int i = 0;
+	char *path;
+	char *full_path = malloc(PATH_MAX_LENGTH);
 
-        while (token != NULL)
-        {
-                snprintf(full_path, PATH_MAX_LENGTH, "%s/%s", token, command);
-                if (access(full_path, F_OK) != -1)
-                {
-                        free(path_env);
-                        return full_path;
-                }
-                token = strtok(NULL, ":");
-        }
-
-        free(path_env);
-        free(full_path);
-        return NULL;
+	while ((path = data->paths[i++]) != NULL)
+	{
+		snprintf(full_path, PATH_MAX_LENGTH, "%s/%s", path, command);
+		if (access(full_path, F_OK) != -1)
+		{
+			return (full_path);
+		}
+	}
+	free(full_path);
+	return (NULL);
 }
-

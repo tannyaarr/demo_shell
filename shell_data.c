@@ -8,7 +8,9 @@
 
 void init_shell_data(shell_data *data)
 {
-	data->path = getenv("PATH");
+	data->paths[0] = "/bin";
+	data->paths[1] = "/usr/bin";
+	data->paths[2] = NULL;
 
 	data->line = NULL;
 	data->num_args = 0;

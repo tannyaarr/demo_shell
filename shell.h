@@ -29,7 +29,7 @@ extern char **environ;
 
 typedef struct shell_data
 {
-	char *path;
+	char *paths[MAX_PATHS];
 	char *line;
 	char *args[MAX_ARGS];
 	int num_args;
