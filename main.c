@@ -11,7 +11,7 @@
 int main(int argc, char **argv, char **env)
 {
     char *input, **args;
-    int interactive = 1, i;
+    int interactive = 1;
 
     (void)argc;
 
@@ -35,6 +35,7 @@ int main(int argc, char **argv, char **env)
         args = split_input(input);
 
         if (args[0] != NULL)
+	{
 
             if (check_builtins(args))
             {
@@ -57,4 +58,15 @@ int main(int argc, char **argv, char **env)
     }
 
     return (EXIT_SUCCESS);
+}
+
+/**
+ * handle_comments - Remove comments from a command
+ * @command: Command string
+ */
+void handle_comments(char *command)
+{
+    char *comment = strchr(command, '#');
+    if (comment)
+        *comment = '\0';
 }

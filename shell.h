@@ -13,6 +13,9 @@
 #define MAX_ARGS 64
 #define MAX_PATH 1024
 #define MAX_BUFFER 1024
+#define MAX_VARIABLE_NAME 1024
+#define MAX_VARIABLE_VALUE 1024
+
 typedef struct alias_t {
 	char *name;
 	char *value;
@@ -38,5 +41,7 @@ char *get_input(void);
 char **split_input(char *input);
 int count_arguments(char **args);
 void handle_signals(int signal);
+Alias *find_alias(char *name);
+void create_alias(char *name, char *value);
 
 #endif /* SHELL_H */
