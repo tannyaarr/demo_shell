@@ -10,13 +10,13 @@ void run_shell_command(shell_data *data)
 {
 	int status;
 
-	if (strcmp(data->args[0], "cd") == 0)
+	if (_strcmp(data->args[0], "cd") == 0)
 	{
 		cd_command(data);
 		return;
 	}
 
-	else if (strcmp(data->args[0], "exit") == 0)
+	else if (_strcmp(data->args[0], "exit") == 0)
 	{
 		if (data->num_args == 1)
 			exit(EXIT_SUCCESS);
@@ -31,7 +31,7 @@ void run_shell_command(shell_data *data)
 			return;
 		}
 	}
-	else if (strcmp(data->args[0], "env") == 0)
+	else if (_strcmp(data->args[0], "env") == 0)
 	{
 		print_env();
 		return;
@@ -130,7 +130,7 @@ void run_file_command(const char *program_name,
 		tokenize(data);
 		run_shell_command(data);
 
-		if (data->args[0] != NULL && strcmp(data->args[0], "exit") == 0)
+		if (data->args[0] != NULL && _strcmp(data->args[0], "exit") == 0)
 			break;
 	}
 
