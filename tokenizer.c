@@ -49,16 +49,24 @@ void tokenize(shell_data *data)
         while (*line && strchr(delim, *line))
             line++;
 
-        if (*line == '\0' || *line == '#')
+        if (*line == '\0')
             break;
+
+        if (*line == '#') {
+            *line = '\0';
+            break; 
+        }
 
         data->args[num_args++] = line;
 
-        while (*line && !strchr(delim, *line))
+        while (*line && !strchr(delim, *line) && *line != '#')
             line++;
 
         if (*line)
-            *line++ = '\0';
+        {
+            *line = '\0';
+            line++;
+        }
     }
 
     data->args[num_args] = NULL;
