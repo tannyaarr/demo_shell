@@ -6,43 +6,41 @@
  * Return: void
  */
 
+
 void run_shell_command(shell_data *data)
 {
-	int status;
+    pid_t pid;
+    int status;
 
-	if (data->args[0] == NULL || strcmp(data->args[0], "") == 0)
-		return;
-	else if (_strcmp(data->args[0], "cd") == 0)
-	{
-		cd_command(data);
-		return;
-	}
+    if (data->args[0] == NULL || strcmp(data->args[0], "") == 0)
+        return;
 
-	else if (_strcmp(data->args[0], "exit") == 0)
-	{
-		if (data->num_args == 1)
-			exit(EXIT_SUCCESS);
-		else if (data->num_args == 2)
-		{
-			status = atoi(data->args[1]);
-			exit(status);
-		}
-		else
-		{
-			fprintf(stderr, "Usage: exit [status]\n");
-			return;
-		}
-	}
-	else if (_strcmp(data->args[0], "env") == 0)
-	{
-		print_env();
-		return;
-	}
+    if (strcmp(data->args[0], "cd") == 0)
+    {
+        cd_command(data);
+        return;
+    }
 
-	execute_command(data);
-	free_shell_data(data);
-	init_shell_data(data);
+    pid = fork();
+    if (pid == -1)
+    {
+        perror("fork");
+        return;
+    }
+    else if (pid == 0)
+    {
+        execvp(data->args[0], data->args);
+        perror("execvp");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        waitpid(pid, &status, 0);
+    }
 }
+
+
+
 
 /**
  * main - Entry point of the shell program
