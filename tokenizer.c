@@ -42,35 +42,22 @@ void tokenize(shell_data *data)
     const char *delim = " \t\n";
     char *line = data->line;
     int num_args = 0;
-    char *end;
-    size_t arg_len;
 
     while (*line && num_args < MAX_ARGS - 1)
     {
         while (*line && strchr(delim, *line))
             line++;
 
-        if (*line == '\0')
-            break;
+        if (*line == '\0' || *line == '#')
+            break; 
 
-        if (*line == '#') {
-            break;
-        }
+        data->args[num_args++] = line;
 
-        end = strpbrk(line, delim);
-        if (end == NULL)
-            end = line + strlen(line);
+        while (*line && !strchr(delim, *line))
+            line++;
 
-        arg_len = end - line;
-        data->args[num_args] = malloc(arg_len + 1);
-        if (data->args[num_args] == NULL) {
-            exit_with_error("Memory allocation error");
-        }
-        strncpy(data->args[num_args], line, arg_len);
-        data->args[num_args][arg_len] = '\0';
-        num_args++;
-
-        line = end;
+        if (*line)
+            *line++ = '\0';
     }
 
     data->args[num_args] = NULL;
