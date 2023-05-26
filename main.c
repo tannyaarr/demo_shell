@@ -98,25 +98,25 @@ int main(int argc, char **argv)
  * @data: shell data
  */
 
-
 void run_file_command(const char *program_name, const char *file_name, shell_data *data)
 {
-     char line[READ_BUF_SIZE];
-     FILE *file;
-
-    if (access(file_name, F_OK) == -1) {
-        fprintf(stderr, "%s: 0: Can't open %s\n", program_name, file_name);
-        return;
-    }
+    FILE *file;
+    char line[READ_BUF_SIZE];
 
     file = fopen(file_name, "r");
-    if (file == NULL) {
-        fprintf(stderr, "%s: Error opening file: %s\n", program_name, file_name);
-        return;
+    if (file == NULL)
+    {
+        perror(program_name);
+        exit(EXIT_FAILURE);
     }
 
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
+        line[strcspn(line, "\n")] = '\0';
+
         data->line = line;
+
+        tokenize(data);
         run_shell_command(data);
     }
 
