@@ -10,7 +10,9 @@ void run_shell_command(shell_data *data)
 {
 	int status;
 
-	if (_strcmp(data->args[0], "cd") == 0)
+	if (data->args[0] == NULL || strcmp(data->args[0], "") == 0)
+		return;
+	else if (_strcmp(data->args[0], "cd") == 0)
 	{
 		cd_command(data);
 		return;
@@ -96,49 +98,33 @@ int main(int argc, char **argv)
  * @program_name: name of program
  * @file_name: name of file
  * @data: shell data
- * Return: void
  */
 
-void run_file_command(const char *program_name,
-		const char *file_name, shell_data *data)
+
+void run_file_command(const char *program_name, const char *file_name, shell_data *data)
 {
-	FILE *file;
-	ssize_t chars_read;
+     char line[READ_BUF_SIZE];
+     FILE *file;
 
-	if (file_name == NULL)
-	{
-		fprintf(stderr, "%s: 0: Can't open %s\n", program_name, file_name);
-		exit(EXIT_FAILURE);
-	}
+    if (access(file_name, F_OK) == -1) {
+        fprintf(stderr, "%s: 0: Can't open %s\n", program_name, file_name);
+        return;
+    }
 
-	file = fopen(file_name, "r");
-	if (feof(file))
-		return;
+    file = fopen(file_name, "r");
+    if (file == NULL) {
+        fprintf(stderr, "%s: Error opening file: %s\n", program_name, file_name);
+        return;
+    }
 
-	if (file == NULL)
-	{
-		perror("fopen");
-		exit(EXIT_FAILURE);
-	}
+    while (fgets(line, sizeof(line), file) != NULL) {
+        data->line = line;
+        run_shell_command(data);
+    }
 
-	while ((_getline(data)) != -1)
-	{
-		printf("(%s) ", program_name);
-		fflush(stdout);
-
-		chars_read = strlen(data->line);
-		if (chars_read > 0 && data->line[chars_read - 1] == '\n')
-			data->line[chars_read - 1] = '\0';
-
-		tokenize(data);
-		run_shell_command(data);
-
-		if (data->args[0] != NULL && _strcmp(data->args[0], "exit") == 0)
-			break;
-	}
-
-	fclose(file);
+    fclose(file);
 }
+
 
 /**
  * read_shell_input - reads shell input
