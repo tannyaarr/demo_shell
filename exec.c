@@ -8,36 +8,42 @@
 
 void execute_command(shell_data *data)
 {
-	pid_t pid;
-	int status;
-	char *path;
+    pid_t pid;
+    int status;
+    char *command_path;
 
-	if (_strcmp(data->args[0], "setenv") == 0)
-	{
-		handle_setenv(data);
-			return;
-	}
-	else if (_strcmp(data->args[0], "unsetenv") == 0)
-	{
-		handle_unsetenv(data);
-			return;
-	}
+    pid = fork();
+    if (pid == -1)
+    {
+        exit_with_error("Fork error");
+    }
+    else if (pid == 0)
+    {
+        command_path = get_command_path(data);
 
-	pid = fork();
-	if (pid == 0)
-	{
-		path = get_command_path(data);
-		if (path == NULL)
-			exit_with_error("%s: command not found\n", data->args[0]);
+        if (command_path == NULL)
+        {
+            fprintf(stderr, "%s: command not found\n", data->args[0]);
+            exit(127);
+        }
 
-		execute_command_child(data, path);
-	}
-	else if (pid < 0)
-		exit_with_error("fork");
-
-	if (!is_builtin_command(data->args[0]))
-		wait_for_child(pid, &status);
+        if (execve(command_path, data->args, environ) == -1)
+        {
+            fprintf(stderr, "%s: execution error\n", data->args[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        wait_for_child(pid, &status);
+        if (WIFEXITED(status))
+        {
+            status = WEXITSTATUS(status);
+            return;
+        }
+    }
 }
+
 
 /**
  * handle_setenv - Handle setenv command
