@@ -134,6 +134,7 @@ int read_shell_input(shell_data *data)
 {
 	ssize_t chars_read;
 
+
 	if (data->line != NULL)
 	{
 		free(data->line);
