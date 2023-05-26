@@ -32,6 +32,7 @@ void run_shell_command(shell_data *data)
         execvp(data->args[0], data->args);
         perror("execvp");
         exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
     }
     else
     {
