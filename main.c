@@ -1,74 +1,175 @@
 #include "shell.h"
 
-Alias *alias_list = NULL;
-char *prev_dir = NULL;
+/**
+ * run_shell_command - Execute the shell command
+ * @data: Pointer to the shell data structure
+ * Return: void
+ */
+
+void run_shell_command(shell_data *data)
+{
+	int status;
+
+	if (_strcmp(data->args[0], "cd") == 0)
+	{
+		cd_command(data);
+		return;
+	}
+
+	else if (_strcmp(data->args[0], "exit") == 0)
+	{
+		if (data->num_args == 1)
+			exit(EXIT_SUCCESS);
+		else if (data->num_args == 2)
+		{
+			status = atoi(data->args[1]);
+			exit(status);
+		}
+		else
+		{
+			fprintf(stderr, "Usage: exit [status]\n");
+			return;
+		}
+	}
+	else if (_strcmp(data->args[0], "env") == 0)
+	{
+		print_env();
+		return;
+	}
+
+	execute_command(data);
+	free_shell_data(data);
+	init_shell_data(data);
+}
 
 /**
- * main - Simple Shell entry point
+ * main - Entry point of the shell program
  * @argc: Number of command-line arguments
  * @argv: Array of command-line arguments
- * @env: Array of environment variables
- * Return: Exit status
+ * Return: 0 on success, otherwise an error code.
  */
-int main(int argc, char **argv, char **env)
+
+int main(int argc, char **argv)
 {
-    char *input, **args;
-    int interactive = 1;
+	char *program_name, *last_slash;
+	shell_data data;
+	int interactive_mode = isatty(STDIN_FILENO);
 
-    (void)argc;
+	init_shell_data(&data);
 
-    if (!isatty(STDIN_FILENO))
-        interactive = 0;
+	program_name = argv[0];
+	last_slash = strrchr(program_name, '/');
+	if (last_slash != NULL)
+		program_name = last_slash + 1;
 
-    environ = env;
-
-    signal(SIGINT, handle_signals);
-    signal(SIGTSTP, SIG_IGN);
-
-    if (argv[1])
-        return (batch_mode(argv[1]));
-
-    while (1)
-    {
-        if (interactive)
-            printf("$ ");
-
-        input = get_input();
-        args = split_input(input);
-
-        if (args[0] != NULL)
+	if (argc > 1)
 	{
+		interactive_mode = 0;
+		run_file_command(program_name, argv[1], &data);
+	}
+	else
+	{
+		while (interactive_mode)
+		{
+			printf("($) ");
+			fflush(stdout);
 
-            if (check_builtins(args))
-            {
-                free(input);
-                free(args);
-                continue;
-            }
+			if (read_shell_input(&data) == -1)
+			{
+				free_shell_data(&data);
+				exit(EXIT_FAILURE);
+			}
 
-            if (execute_command(args) == -1)
-            {
-                perror("Execution failed");
-                free(input);
-                free(args);
-                continue;
-            }
-        }
+			if (data.line == NULL)
+				break;
 
-        free(input);
-        free(args);
-    }
+			run_shell_command(&data);
+		}
+	}
 
-    return (EXIT_SUCCESS);
+	return (0);
+}
+
+
+/**
+ * run_file_command - File command function
+ * @program_name: name of program
+ * @file_name: name of file
+ * @data: shell data
+ * Return: void
+ */
+
+void run_file_command(const char *program_name,
+		const char *file_name, shell_data *data)
+{
+	FILE *file;
+	ssize_t chars_read;
+
+	if (file_name == NULL)
+	{
+		fprintf(stderr, "%s: no input file\n", program_name);
+		exit(EXIT_FAILURE);
+	}
+
+	file = fopen(file_name, "r");
+	if (file == NULL)
+	{
+		perror("fopen");
+		exit(EXIT_FAILURE);
+	}
+
+	while ((_getline(data)) != -1)
+	{
+		printf("(%s) ", program_name);
+		fflush(stdout);
+
+		chars_read = strlen(data->line);
+		if (chars_read > 0 && data->line[chars_read - 1] == '\n')
+			data->line[chars_read - 1] = '\0';
+
+		tokenize(data);
+		run_shell_command(data);
+
+		if (data->args[0] != NULL && _strcmp(data->args[0], "exit") == 0)
+			break;
+	}
+
+	fclose(file);
 }
 
 /**
- * handle_comments - Remove comments from a command
- * @command: Command string
+ * read_shell_input - reads shell input
+ * @data: Struct to store data
+ * Return: 0 if successful, -1 on error or end of input
  */
-void handle_comments(char *command)
+int read_shell_input(shell_data *data)
 {
-    char *comment = strchr(command, '#');
-    if (comment)
-        *comment = '\0';
+	ssize_t chars_read;
+
+	if (data->line != NULL)
+	{
+		free(data->line);
+		data->line = NULL;
+	}
+
+	chars_read = _getline(data);
+	if (chars_read == -1)
+	{
+		free_shell_data(data);
+		return (-1);
+	}
+
+	if (chars_read == 0)
+		return (-1);
+
+	if (data->line != NULL && data->line[0] != '\0')
+	{
+		if (data->line[chars_read - 1] == '\n')
+			data->line[chars_read - 1] = '\0';
+		tokenize(data);
+		return (0);
+	}
+
+	return (-1);
 }
+

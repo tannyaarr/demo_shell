@@ -1,107 +1,101 @@
 #include "shell.h"
 
 /**
- * is_executable - Check if a file is executable
- * @path: Path to the file
- * Return: 1 if the file is executable, 0 otherwise
+ * execute_command - Execute shell command
+ * @data: Struct to store data
+ * Return: void
  */
-int is_executable(char *path)
+
+void execute_command(shell_data *data)
 {
-    struct stat st;
+	pid_t pid;
+	int status;
+	char *path;
 
-    if (stat(path, &st) == 0 && st.st_mode & S_IXUSR)
-        return (1);
+	if (_strcmp(data->args[0], "setenv") == 0)
+	{
+		handle_setenv(data);
+			return;
+	}
+	else if (_strcmp(data->args[0], "unsetenv") == 0)
+	{
+		handle_unsetenv(data);
+			return;
+	}
 
-    return (0);
+	pid = fork();
+	if (pid == 0)
+	{
+		path = get_command_path(data);
+		if (path == NULL)
+			exit_with_error("%s: command not found\n", data->args[0]);
+
+		execute_command_child(data, path);
+	}
+	else if (pid < 0)
+		exit_with_error("fork");
+
+	if (!is_builtin_command(data->args[0]))
+		wait_for_child(pid, &status);
 }
 
 /**
- * handle_signals - Handle signals
- * @signal: Signal number
+ * handle_setenv - Handle setenv command
+ * @data: Struct to store data
+ * Return: void
  */
-void handle_signals(int signal)
-{
-    if (signal == SIGINT)
-    {
-        putchar('\n');
-        printf("$ ");
-        fflush(stdout);
-    }
-}
 
+void handle_setenv(shell_data *data)
+{
+	if (data->num_args != 3)
+		exit_with_error("Usage: setenv VARIABLE VALUE\n");
+
+	if (setenv(data->args[1], data->args[2], 1) != 0)
+		perror("setenv");
+}
 
 /**
- * execute_command - Execute an external command
- * @args: Array of arguments
- * Return: 0 on success, -1 on failure
+ * handle_unsetenv - Handle unsetenv command
+ * @data: Struct to store data
+ * Return: void
  */
-int execute_command(char **args)
+
+void handle_unsetenv(shell_data *data)
 {
-    pid_t child_pid;
-    int status;
+	if (data->num_args != 2)
+		exit_with_error("Usage: unsetenv VARIABLE\n");
 
-    child_pid = fork();
-    if (child_pid == -1)
-    {
-        perror("Fork error");
-        return (-1);
-    }
-
-    if (child_pid == 0)
-    {
-        if (execve(args[0], args, environ) == -1)
-        {
-            perror("Execution error");
-            exit(EXIT_FAILURE);
-        }
-    }
-    else
-    {
-        waitpid(child_pid, &status, WUNTRACED);
-    }
-
-    return (0);
+	if (unsetenv(data->args[1]) != 0)
+		perror("unsetenv");
 }
 
-char **split_command(char *command)
+/**
+ * execute_command_child - Execute command in child process
+ * @data: Struct to store data
+ * @path: Command path
+ * Return: void
+ */
+
+void execute_command_child(shell_data *data, char *path)
 {
-    char **args = NULL;
-    char *token;
-    int bufsize = MAX_ARGS;
-    int i = 0;
+	execve(path, data->args, environ);
+	perror("execve");
+	exit(EXIT_FAILURE);
+}
 
-    args = malloc(bufsize * sizeof(char *));
-    if (args == NULL)
-    {
-        perror("malloc error");
-        exit(EXIT_FAILURE);
-    }
+/**
+ * exit_with_error - Print error message and exit with failure
+ * @format: Format string
+ * ...: Variable arguments
+ * Return: void
+ */
 
-    token = strtok(command, " \t\n\r");
-    while (token != NULL)
-    {
-        args[i] = strdup(token);
-        if (args[i] == NULL)
-        {
-            perror("strdup error");
-            exit(EXIT_FAILURE);
-        }
-        i++;
+void exit_with_error(const char *format, ...)
+{
+	va_list args;
 
-        if (i >= bufsize)
-        {
-            bufsize += MAX_ARGS;
-            args = realloc(args, bufsize * sizeof(char *));
-            if (args == NULL)
-            {
-                perror("realloc error");
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        token = strtok(NULL, " \t\n\r");
-    }
-    args[i] = NULL;
-
-    return args;
+	va_start(args, format);
+	vfprintf(stderr, format, args);
+	va_end(args);
+	exit(EXIT_FAILURE);
 }
