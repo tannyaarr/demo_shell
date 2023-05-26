@@ -9,6 +9,9 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <ctype.h>
+#include <ctype.h>
+
 
 #define MAX_ARGS 64
 #define MAX_PATH 1024
@@ -22,9 +25,8 @@ typedef struct alias_t {
 	struct alias_t *next;
 } Alias;
 
-Alias *alias_list = NULL;
-char *prev_dir = NULL;
-
+extern struct alias_t *alias_list;
+extern char *prev_dir;
 extern char **environ;
 
 int shell_cd(char **args);
@@ -43,5 +45,12 @@ int count_arguments(char **args);
 void handle_signals(int signal);
 Alias *find_alias(char *name);
 void create_alias(char *name, char *value);
+int batch_mode(char *filename);
+void handle_comments(char *command);
+char *replace_variables(char *command);
+void free_aliases(void);
+void free_args(char **args);
+int execute_builtin(char **args);
+char **split_command(char *command);
 
 #endif /* SHELL_H */

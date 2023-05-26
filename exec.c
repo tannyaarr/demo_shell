@@ -62,3 +62,46 @@ int execute_command(char **args)
 
     return (0);
 }
+
+char **split_command(char *command)
+{
+    char **args = NULL;
+    char *token;
+    int bufsize = MAX_ARGS;
+    int i = 0;
+
+    args = malloc(bufsize * sizeof(char *));
+    if (args == NULL)
+    {
+        perror("malloc error");
+        exit(EXIT_FAILURE);
+    }
+
+    token = strtok(command, " \t\n\r");
+    while (token != NULL)
+    {
+        args[i] = strdup(token);
+        if (args[i] == NULL)
+        {
+            perror("strdup error");
+            exit(EXIT_FAILURE);
+        }
+        i++;
+
+        if (i >= bufsize)
+        {
+            bufsize += MAX_ARGS;
+            args = realloc(args, bufsize * sizeof(char *));
+            if (args == NULL)
+            {
+                perror("realloc error");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        token = strtok(NULL, " \t\n\r");
+    }
+    args[i] = NULL;
+
+    return args;
+}

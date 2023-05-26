@@ -8,7 +8,7 @@
 int shell_alias(char **args)
 {
 	int i;
-	char *name, value;
+	char *name, *value;
 
     if (args[1] == NULL)
     {

@@ -1,5 +1,7 @@
 #include "shell.h"
 
+Alias *alias_list = NULL;
+char *prev_dir = NULL;
 
 /**
  * main - Simple Shell entry point

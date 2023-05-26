@@ -82,7 +82,7 @@ char *replace_variables(char *command)
     char *variable_end;
     char variable_name[MAX_VARIABLE_NAME];
     char variable_value[MAX_VARIABLE_VALUE];
-    int variable_length;
+    int variable_length, last_status = 0;
     char *env_value;
 
     if (!replaced)
@@ -138,3 +138,5 @@ char *replace_variables(char *command)
 
     return replaced;
 }
+
+

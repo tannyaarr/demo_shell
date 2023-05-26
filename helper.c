@@ -88,3 +88,53 @@ char *find_command(char *command)
     free(path);
     return (NULL);
 }
+
+#include "shell.h"
+
+/**
+ * free_args - Free the memory allocated for the arguments array
+ * @args: Arguments array
+ */
+void free_args(char **args)
+{
+    int i;
+
+    if (args == NULL)
+        return;
+
+    for (i = 0; args[i] != NULL; i++)
+        free(args[i]);
+
+    free(args);
+}
+
+/**
+ * execute_builtin - Execute a builtin command
+ * @args: Arguments array
+ * Return: 1 if the command is a builtin, 0 otherwise
+ */
+int execute_builtin(char **args)
+{
+    int status = 0;
+
+    if (args == NULL || args[0] == NULL)
+        return 0;
+
+    if (strcmp(args[0], "cd") == 0)
+        status = shell_cd(args);
+    else if (strcmp(args[0], "exit") == 0)
+        status = shell_exit(args);
+    else if (strcmp(args[0], "env") == 0)
+        status = shell_env(args);
+    else if (strcmp(args[0], "setenv") == 0)
+        status = shell_setenv(args);
+    else if (strcmp(args[0], "unsetenv") == 0)
+        status = shell_unsetenv(args);
+    else if (strcmp(args[0], "alias") == 0)
+        status = shell_alias(args);
+    else
+        return 0;
+
+    return status;
+}
+
