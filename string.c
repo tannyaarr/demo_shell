@@ -8,8 +8,16 @@
  * Return: 0 if the strings are equal, negative value if s1 < s2,
  * positive value if s1 > s2
  */
+
 int _strcmp(const char *s1, const char *s2)
 {
+	if (s1 == NULL && s2 == NULL)
+		return (0);
+	else if (s1 == NULL)
+		return (-1);
+	else if (s2 == NULL)
+		return (1);
+
 	while (*s1 && (*s1 == *s2))
 	{
 		s1++;
@@ -17,6 +25,7 @@ int _strcmp(const char *s1, const char *s2)
 	}
 	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
+
 
 /**
  * _strchr - Locate character in string

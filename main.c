@@ -107,11 +107,14 @@ void run_file_command(const char *program_name,
 
 	if (file_name == NULL)
 	{
-		fprintf(stderr, "%s: no input file\n", program_name);
+		fprintf(stderr, "%s: 0: Can't open %s\n", program_name, file_name);
 		exit(EXIT_FAILURE);
 	}
 
 	file = fopen(file_name, "r");
+	if (feof(file))
+		return;
+
 	if (file == NULL)
 	{
 		perror("fopen");
