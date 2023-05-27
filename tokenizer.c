@@ -30,7 +30,6 @@ char *_strpbrk(const char *str, const char *accept)
 	return (NULL);
 }
 
-
 /**
  * tokenize - tokenize a string into an array of strings
  * @data: shell data struct
@@ -39,28 +38,26 @@ char *_strpbrk(const char *str, const char *accept)
 
 void tokenize(shell_data *data)
 {
-    const char *delim = " \t\n";
-    char *line = data->line;
-    int num_args = 0;
+	const char *delim = " \t\n";
+	char *line = data->line;
+	int num_args = 0;
 
-    while (*line && num_args < MAX_ARGS - 1)
-    {
-        while (*line && strchr(delim, *line))
-            line++;
+	while (*line && num_args < MAX_ARGS - 1)
+	{
+		while (*line && strchr(delim, *line))
+			line++;
 
-        if (*line == '\0' || *line == '#')
-            break; 
+	if (*line == '\0' || *line == '#')
+		break;
+	data->args[num_args++] = line;
 
-        data->args[num_args++] = line;
+	while (*line && !strchr(delim, *line))
+		line++;
 
-        while (*line && !strchr(delim, *line))
-            line++;
+	if (*line)
+		*line++ = '\0';
+	}
 
-        if (*line)
-            *line++ = '\0';
-    }
-
-    data->args[num_args] = NULL;
-    data->num_args = num_args;
+	data->args[num_args] = NULL;
+	data->num_args = num_args;
 }
-

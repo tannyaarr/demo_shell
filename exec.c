@@ -8,40 +8,39 @@
 
 void execute_command(shell_data *data)
 {
-    pid_t pid;
-    int status;
-    char *command_path;
+	pid_t pid;
+	int status;
+	char *command_path;
 
-    pid = fork();
-    if (pid == -1)
-    {
-        exit_with_error("Fork error");
-    }
-    else if (pid == 0)
-    {
-        command_path = get_command_path(data);
+	pid = fork();
 
-        if (command_path == NULL)
-        {
-            fprintf(stderr, "%s: command not found\n", data->args[0]);
-            exit(127);
-        }
-
-        if (execve(command_path, data->args, environ) == -1)
-        {
-            fprintf(stderr, "%s: execution error\n", data->args[0]);
-            exit(EXIT_FAILURE);
-        }
-    }
-    else
-    {
-        wait_for_child(pid, &status);
-        if (WIFEXITED(status))
-        {
-            status = WEXITSTATUS(status);
-            return;
-        }
-    }
+	if (pid == -1)
+	{
+		exit_with_error("Fork error");
+	}
+	else if (pid == 0)
+	{
+		command_path = get_command_path(data);
+		if (command_path == NULL)
+		{
+			fprintf(stderr, "%s: command not found\n", data->args[0]);
+			exit(127);
+		}
+		if (execve(command_path, data->args, environ) == -1)
+		{
+			fprintf(stderr, "%s: execution error\n", data->args[0]);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		wait_for_child(pid, &status);
+		if (WIFEXITED(status))
+		{
+			status = WEXITSTATUS(status);
+			return;
+		}
+	}
 }
 
 

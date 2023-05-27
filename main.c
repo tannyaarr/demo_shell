@@ -6,42 +6,38 @@
  * Return: void
  */
 
-
 void run_shell_command(shell_data *data)
 {
-    pid_t pid;
-    int status;
+	pid_t pid;
+	int status;
 
-    if (data->args[0] == NULL || strcmp(data->args[0], "") == 0)
-        return;
+	if (data->args[0] == NULL || strcmp(data->args[0], "") == 0)
+		return;
 
-    if (strcmp(data->args[0], "cd") == 0)
-    {
-        cd_command(data);
-        return;
-    }
+	if (strcmp(data->args[0], "cd") == 0)
+	{
+		cd_command(data);
+		return;
+	}
 
-    pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        return;
-    }
-    else if (pid == 0)
-    {
-        execvp(data->args[0], data->args);
-        perror("execvp");
-        exit(EXIT_FAILURE);
-	exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        waitpid(pid, &status, 0);
-    }
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return;
+	}
+	else if (pid == 0)
+	{
+		execvp(data->args[0], data->args);
+		perror("execvp");
+		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+	}
 }
-
-
-
 
 /**
  * main - Entry point of the shell program
@@ -91,39 +87,35 @@ int main(int argc, char **argv)
 	return (0);
 }
 
-
 /**
  * run_file_command - File command function
  * @program_name: name of program
  * @file_name: name of file
  * @data: shell data
  */
-
-void run_file_command(const char *program_name, const char *file_name, shell_data *data)
+void run_file_command(const char *program_name,
+		const char *file_name, shell_data *data)
 {
-    FILE *file;
-    char line[READ_BUF_SIZE];
+	FILE *file;
+	char line[READ_BUF_SIZE];
 
-    file = fopen(file_name, "r");
-    if (file == NULL)
-    {
-        perror(program_name);
-        exit(EXIT_FAILURE);
-    }
+	file = fopen(file_name, "r");
+	if (file == NULL)
+	{
+		perror(program_name);
+		exit(EXIT_FAILURE);
+	}
 
-    while (fgets(line, sizeof(line), file) != NULL)
-    {
-        line[strcspn(line, "\n")] = '\0';
+	while (fgets(line, sizeof(line), file) != NULL)
+	{
+		line[strcspn(line, "\n")] = '\0';
+		data->line = line;
+		tokenize(data);
+		run_shell_command(data);
+	}
 
-        data->line = line;
-
-        tokenize(data);
-        run_shell_command(data);
-    }
-
-    fclose(file);
+	fclose(file);
 }
-
 
 /**
  * read_shell_input - reads shell input
@@ -161,4 +153,3 @@ int read_shell_input(shell_data *data)
 
 	return (-1);
 }
-
