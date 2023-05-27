@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 
 			if (data.line == NULL)
 				break;
-
+			tokenize(&data);
 			run_shell_command(&data);
 		}
 	}
