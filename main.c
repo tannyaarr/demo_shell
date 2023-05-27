@@ -79,7 +79,6 @@ int main(int argc, char **argv)
 
 			if (data.line == NULL)
 				break;
-
 			run_shell_command(&data);
 		}
 	}

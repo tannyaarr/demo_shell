@@ -36,6 +36,7 @@ char *_strpbrk(const char *str, const char *accept)
  * Return: void
  */
 
+
 void tokenize(shell_data *data)
 {
 	const char *delim = " \t\n";
