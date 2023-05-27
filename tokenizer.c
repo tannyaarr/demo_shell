@@ -37,49 +37,30 @@ char *_strpbrk(const char *str, const char *accept)
  * Return: void
  */
 
+
 void tokenize(shell_data *data)
 {
     const char *delim = " \t\n";
     char *line = data->line;
     int num_args = 0;
-    char *token, *token_start, *token_end;
-    size_t token_length;
 
     while (*line && num_args < MAX_ARGS - 1)
     {
         while (*line && strchr(delim, *line))
             line++;
 
-        if (*line == '#')
-        {
-            data->args[num_args] = NULL;
-            return;
-        }
+        if (*line == '\0' || *line == '#')
+            break; 
 
-        if (*line == '\0')
-            break;
+        data->args[num_args++] = line;
 
-        token_start = line;
-        token_end = strpbrk(line, delim);
+        while (*line && !strchr(delim, *line))
+            line++;
 
-        if (token_end == NULL)
-            token_end = line + strlen(line);
-
-        token_length = token_end - token_start;
-        if (token_length > 0)
-        {
-            token = malloc(token_length + 1);
-            strncpy(token, token_start, token_length);
-            token[token_length] = '\0';
-
-            data->args[num_args++] = token;
-
-            if (num_args == MAX_ARGS - 1)
-                break;
-        }
-
-        line = token_end;
+        if (*line)
+            *line++ = '\0';
     }
 
     data->args[num_args] = NULL;
+    data->num_args = num_args;
 }
