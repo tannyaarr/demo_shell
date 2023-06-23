@@ -33,6 +33,7 @@ typedef struct shell_data
 	char *line;
 	char *args[MAX_ARGS];
 	int num_args;
+	int status;
 } shell_data;
 
 char *get_path(struct shell_data *data, const char *command);

@@ -31,11 +31,12 @@ void run_shell_command(shell_data *data)
 		execvp(data->args[0], data->args);
 		perror("execvp");
 		exit(EXIT_FAILURE);
-		exit(EXIT_SUCCESS);
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
+		do {
+			waitpid(pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 }
 
@@ -48,43 +49,49 @@ void run_shell_command(shell_data *data)
 
 int main(int argc, char **argv)
 {
-	char *program_name, *last_slash;
-	shell_data data;
-	int interactive_mode = isatty(STDIN_FILENO);
+    char *program_name, *last_slash;
+    shell_data data;
 
-	init_shell_data(&data);
+    init_shell_data(&data);
 
-	program_name = argv[0];
-	last_slash = strrchr(program_name, '/');
-	if (last_slash != NULL)
-		program_name = last_slash + 1;
+    program_name = argv[0];
+    last_slash = strrchr(program_name, '/');
+    if (last_slash != NULL)
+        program_name = last_slash + 1;
 
-	if (argc > 1)
-	{
-		interactive_mode = 0;
-		run_file_command(program_name, argv[1], &data);
-	}
-	else
-	{
-		while (interactive_mode)
-		{
-			printf("($) ");
-			fflush(stdout);
+    if (argc > 1)
+    {
+        run_file_command(program_name, argv[1], &data);
+    }
+    else
+    {
+        int interactive_mode = isatty(STDIN_FILENO);
 
-			if (read_shell_input(&data) == -1)
-			{
-				free_shell_data(&data);
-				exit(EXIT_FAILURE);
-			}
+        while (1)
+        {
+            if (interactive_mode)
+            {
+                printf("($) ");
+                fflush(stdout);
+            }
 
-			if (data.line == NULL)
-				break;
-			run_shell_command(&data);
-		}
-	}
+            if (read_shell_input(&data) == -1)
+            {
+                free_shell_data(&data);
+                exit(EXIT_FAILURE);
+            }
 
-	return (0);
+            if (data.line == NULL)
+                break;
+
+            run_shell_command(&data);
+        }
+    }
+
+    return 0;
 }
+
+
 
 /**
  * run_file_command - File command function
